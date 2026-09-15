@@ -177,6 +177,9 @@
   align-items: center;
   overflow: hidden;
   min-width: 0;
+  background-image: url('/images/sky.png');
+  background-size: cover;
+  background-position: center;
 }
 
 /* Atmospheric warm radial glow */
