@@ -10,7 +10,7 @@ export const WelcomeState = memo(function WelcomeState() {
 
   const actions: {
     type: ContainerType;
-    icon: React.ComponentType<{ size: number }>;
+    icon: React.ComponentType<{ size: number; className?: string }>;
     label: string;
     description: string;
   }[] = [
