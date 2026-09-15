@@ -5,8 +5,10 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  memo,
 } from "react";
 import { useCanvasStore } from "@/app/_lib/store/canvas-store";
+import { useShallow } from "zustand/react/shallow";
 import { CanvasBackground } from "./CanvasBackground";
 import { ContainerShell } from "@/app/_components/containers/ContainerShell";
 import { FloatingToolbar } from "@/app/_components/toolbar/FloatingToolbar";
@@ -27,28 +29,27 @@ export function WorkspaceCanvas() {
 
   useDemoWorkspace();
 
-  const {
-    panX,
-    panY,
-    zoom,
-    tool,
-    containers,
-    isCommandPaletteOpen,
-    contextMenuState,
-    setPan,
-    setZoom,
-    clearSelection,
-    openCommandPalette,
-    closeCommandPalette,
-    closeContextMenu,
-    fitCanvas,
-  } = useCanvasStore();
+  // We don't subscribe to panX, panY, zoom here to avoid re-rendering the whole canvas on every frame of a pan.
+  const tool = useCanvasStore((s) => s.tool);
+  const isCommandPaletteOpen = useCanvasStore((s) => s.isCommandPaletteOpen);
+  const contextMenuState = useCanvasStore(useShallow((s) => s.contextMenuState));
+  
+  const setPan = useCanvasStore((s) => s.setPan);
+  const setZoom = useCanvasStore((s) => s.setZoom);
+  const clearSelection = useCanvasStore((s) => s.clearSelection);
+  const openCommandPalette = useCanvasStore((s) => s.openCommandPalette);
+  const closeCommandPalette = useCanvasStore((s) => s.closeCommandPalette);
+  const closeContextMenu = useCanvasStore((s) => s.closeContextMenu);
+  const fitCanvas = useCanvasStore((s) => s.fitCanvas);
+  const setTool = useCanvasStore((s) => s.setTool);
+  const addContainer = useCanvasStore((s) => s.addContainer);
 
   // ── Wheel zoom / pan ─────────────────────────────────────
 
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
+      const state = useCanvasStore.getState();
 
       if (e.ctrlKey || e.metaKey) {
         // Zoom
@@ -58,21 +59,21 @@ export function WorkspaceCanvas() {
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        const delta = -e.deltaY * ZOOM_SENSITIVITY * zoom;
-        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom + delta * zoom));
-        const ratio = newZoom / zoom;
+        const delta = -e.deltaY * ZOOM_SENSITIVITY * state.zoom;
+        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, state.zoom + delta * state.zoom));
+        const ratio = newZoom / state.zoom;
 
-        const newPanX = mouseX - ratio * (mouseX - panX);
-        const newPanY = mouseY - ratio * (mouseY - panY);
+        const newPanX = mouseX - ratio * (mouseX - state.panX);
+        const newPanY = mouseY - ratio * (mouseY - state.panY);
 
-        setZoom(newZoom);
-        setPan(newPanX, newPanY);
+        state.setZoom(newZoom);
+        state.setPan(newPanX, newPanY);
       } else {
         // Pan
-        setPan(panX - e.deltaX, panY - e.deltaY);
+        state.setPan(state.panX - e.deltaX, state.panY - e.deltaY);
       }
     },
-    [zoom, panX, panY, setZoom, setPan]
+    []
   );
 
   useEffect(() => {
@@ -105,9 +106,10 @@ export function WorkspaceCanvas() {
       const dx = e.clientX - lastPointerRef.current.x;
       const dy = e.clientY - lastPointerRef.current.y;
       lastPointerRef.current = { x: e.clientX, y: e.clientY };
-      setPan(panX + dx, panY + dy);
+      const state = useCanvasStore.getState();
+      state.setPan(state.panX + dx, state.panY + dy);
     },
-    [panX, panY, setPan]
+    []
   );
 
   const handlePointerUp = useCallback(() => {
@@ -126,8 +128,6 @@ export function WorkspaceCanvas() {
   );
 
   // ── Keyboard shortcuts ────────────────────────────────────
-
-  const { setTool, addContainer } = useCanvasStore();
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -199,24 +199,7 @@ export function WorkspaceCanvas() {
     fitCanvas,
   ]);
 
-  // ── Sorted containers (by zIndex) ─────────────────────────
-
-  const sortedContainers = useMemo(
-    () => [...containers].sort((a, b) => a.zIndex - b.zIndex),
-    [containers]
-  );
-
-  const minimizedContainers = useMemo(
-    () => containers.filter((c) => c.minimized),
-    [containers]
-  );
-
-  const visibleContainers = useMemo(
-    () => sortedContainers.filter((c) => !c.minimized),
-    [sortedContainers]
-  );
-
-  const hasContainers = containers.length > 0;
+  // ── Render ───────────────────────────────────────────────
 
   const cursorClass =
     tool === "hand"
@@ -241,40 +224,21 @@ export function WorkspaceCanvas() {
           }
         }}
       >
-        {/* Dot background */}
-        <CanvasBackground panX={panX} panY={panY} zoom={zoom} />
+        {/* Dot background - now extracts its own pan/zoom to avoid re-rendering WorkspaceCanvas */}
+        <CanvasBackgroundLayer />
 
         {/* Container world (transformed) */}
-        <div
-          className="absolute inset-0 origin-top-left"
-          style={{
-            transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
-            transformOrigin: "0 0",
-            willChange: "transform",
-          }}
-        >
-          {visibleContainers.map((container) => (
-            <ContainerShell key={container.id} container={container} />
-          ))}
-        </div>
+        <ContainerWorldLayer />
       </div>
 
       {/* Welcome state */}
-      {!hasContainers && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-          <div className="pointer-events-auto">
-            <WelcomeState />
-          </div>
-        </div>
-      )}
+      <WelcomeLayer />
 
       {/* Floating toolbar */}
       <FloatingToolbar />
 
       {/* Minimized tray */}
-      {minimizedContainers.length > 0 && (
-        <MinimizedTray containers={minimizedContainers} />
-      )}
+      <MinimizedTrayLayer />
 
       {/* Command palette */}
       {isCommandPaletteOpen && <CommandPalette />}
@@ -290,18 +254,87 @@ export function WorkspaceCanvas() {
       )}
 
       {/* Zoom indicator */}
-      <div
-        className="absolute bottom-4 right-4 text-xs px-2 py-1 rounded"
-        style={{
-          background: "var(--surface)",
-          border: "1px solid var(--surface-border)",
-          color: "var(--text-muted)",
-          fontVariantNumeric: "tabular-nums",
-          zIndex: 100,
-        }}
-      >
-        {Math.round(zoom * 100)}%
-      </div>
+      <ZoomIndicator />
     </div>
   );
 }
+
+const CanvasBackgroundLayer = memo(function CanvasBackgroundLayer() {
+  const panX = useCanvasStore((s) => s.panX);
+  const panY = useCanvasStore((s) => s.panY);
+  const zoom = useCanvasStore((s) => s.zoom);
+  return <CanvasBackground panX={panX} panY={panY} zoom={zoom} />;
+});
+
+const ContainerWorldLayer = memo(function ContainerWorldLayer() {
+  const panX = useCanvasStore((s) => s.panX);
+  const panY = useCanvasStore((s) => s.panY);
+  const zoom = useCanvasStore((s) => s.zoom);
+
+  return (
+    <div
+      className="absolute inset-0 origin-top-left"
+      style={{
+        transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
+        transformOrigin: "0 0",
+        willChange: "transform",
+      }}
+    >
+      <ContainersListLayer />
+    </div>
+  );
+});
+
+const ContainersListLayer = memo(function ContainersListLayer() {
+  const containers = useCanvasStore((s) => s.containers);
+
+  const visibleContainers = useMemo(() => {
+    return [...containers]
+      .filter((c) => !c.minimized)
+      .sort((a, b) => a.zIndex - b.zIndex);
+  }, [containers]);
+  
+  return (
+    <>
+      {visibleContainers.map((container) => (
+        <ContainerShell key={container.id} container={container} />
+      ))}
+    </>
+  );
+});
+
+const WelcomeLayer = memo(function WelcomeLayer() {
+  const hasContainers = useCanvasStore((s) => s.containers.length > 0);
+  if (hasContainers) return null;
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+      <div className="pointer-events-auto">
+        <WelcomeState />
+      </div>
+    </div>
+  );
+});
+
+const MinimizedTrayLayer = memo(function MinimizedTrayLayer() {
+  const minimizedContainers = useCanvasStore(useShallow((s) => s.containers.filter(c => c.minimized)));
+  if (minimizedContainers.length === 0) return null;
+  return <MinimizedTray containers={minimizedContainers} />;
+});
+
+const ZoomIndicator = memo(function ZoomIndicator() {
+  const zoom = useCanvasStore((s) => s.zoom);
+  return (
+    <div
+      className="absolute bottom-4 right-4 text-xs px-2 py-1 rounded"
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--surface-border)",
+        color: "var(--text-muted)",
+        fontVariantNumeric: "tabular-nums",
+        zIndex: 100,
+      }}
+    >
+      {Math.round(zoom * 100)}%
+    </div>
+  );
+});

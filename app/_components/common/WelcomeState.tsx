@@ -62,7 +62,7 @@ export const WelcomeState = memo(function WelcomeState() {
             }}
             onClick={() => addContainer(type)}
           >
-            <Icon size={13} style={{ color: "var(--accent-text)" }} />
+            <Icon size={13} className="text-[var(--accent-text)]" />
             {label}
           </button>
         ))}
