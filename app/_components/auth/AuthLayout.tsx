@@ -22,7 +22,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       >
         <div className="auth-topbar-brand" style={{ display: "flex", alignItems: "center", gap: "12px", zIndex: 2 }}>
           <div style={{ width: "24px", height: "24px", background: "white", borderRadius: "4px" }} />
-          <span style={{ fontWeight: 600, fontSize: "14px", letterSpacing: "0.05em", textTransform: "uppercase" }}>FlexiAi</span>
+          <span style={{ fontWeight: 600, fontSize: "14px", letterSpacing: "0.05em", textTransform: "uppercase" }}>Orbit</span>
         </div>
 
         {/* Premium subtle background glow */}
@@ -50,7 +50,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <div className="auth-hero-bottom" style={{ zIndex: 2, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "13px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 500 }}>
-          <span>© 2026 FlexiAi</span>
+          <span>© 2026 Orbit</span>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <span>Ideas have more space here</span>
             <div style={{ width: "40px", height: "1px", background: "rgba(255,255,255,0.2)" }} />
