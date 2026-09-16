@@ -141,11 +141,11 @@ function defaultTitle(type: ContainerType): string {
 
 function defaultSize(type: ContainerType): ContainerSize {
   const map: Record<ContainerType, ContainerSize> = {
-    chat: { width: 600, height: 800 },
-    note: { width: 480, height: 600 },
-    search: { width: 540, height: 720 },
-    code: { width: 720, height: 640 },
-    drawing: { width: 800, height: 640 },
+    chat: { width: 600, height: 700 },
+    note: { width: 460, height: 520 },
+    search: { width: 520, height: 600 },
+    code: { width: 600, height: 520 },
+    drawing: { width: 680, height: 540 },
   };
   return map[type];
 }
@@ -154,13 +154,12 @@ const WORKSPACE_ID = "default";
 
 function getInitialContainers(): OrbContainer[] {
   const ws = WORKSPACE_ID;
-  
-  const c1 = createContainer("search", { x: -750, y: -150 }, ws);
-  c1.size = { width: 500, height: 420 };
-  
-  const c2 = createContainer("chat", { x: -200, y: -350 }, ws);
-  c2.size = { width: 620, height: 750 };
-  // Pre-populate some code into the chat container to match screenshot vibe
+
+  const c1 = createContainer("search", { x: -750, y: -200 }, ws);
+  c1.size = { width: 480, height: 450 };
+
+  const c2 = createContainer("chat", { x: -100, y: -320 }, ws);
+  c2.size = { width: 600, height: 720 };
   if (c2.type === "chat") {
     c2.state.messages = [
       {
@@ -171,20 +170,14 @@ function getInitialContainers(): OrbContainer[] {
       }
     ];
   }
-  
-  const c3 = createContainer("search", { x: 470, y: -450 }, ws);
-  c3.size = { width: 460, height: 420 };
-  
-  const c4 = createContainer("note", { x: 470, y: 50 }, ws);
-  c4.size = { width: 440, height: 500 };
-  if (c4.type === "note") {
-    c4.state.content = "Project Ideas:\n\n- Dark mode support\n- Mobile responsive\n- Offline sync";
-  }
-  
-  const c5 = createContainer("search", { x: 970, y: -200 }, ws);
-  c5.size = { width: 480, height: 560 };
-  
-  return [c1, c2, c3, c4, c5];
+
+  const c3 = createContainer("code", { x: 580, y: -320 }, ws);
+  c3.size = { width: 500, height: 420 };
+
+  const c4 = createContainer("search", { x: 550, y: 180 }, ws);
+  c4.size = { width: 400, height: 450 };
+
+  return [c1, c2, c3, c4];
 }
 
 export const useCanvasStore = create<CanvasState>()(
@@ -210,7 +203,17 @@ export const useCanvasStore = create<CanvasState>()(
       setPan: (panX, panY) => set({ panX, panY }),
       setZoom: (zoom) => set({ zoom: Math.min(Math.max(zoom, 0.2), 3) }),
       setTool: (tool) => set({ tool }),
-      fitCanvas: () => set({ panX: 0, panY: 0, zoom: 1 }),
+      fitCanvas: () => {
+        if (typeof document !== 'undefined') {
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => { });
+          } else {
+            if (document.exitFullscreen) {
+              document.exitFullscreen();
+            }
+          }
+        }
+      },
 
       // Containers
       addContainer: (type, position) => {
@@ -475,6 +478,16 @@ export const useCanvasStore = create<CanvasState>()(
     }),
     {
       name: "orbit-canvas-state",
+      version: 4,
+      migrate: (persistedState: any, version: number) => {
+        // Discard old state and return fresh layout on version mismatch
+        return {
+          panX: 0,
+          panY: 0,
+          zoom: 1,
+          containers: getInitialContainers(),
+        } as any;
+      },
       partialize: (state) => ({
         panX: state.panX,
         panY: state.panY,

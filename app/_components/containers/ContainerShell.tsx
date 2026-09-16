@@ -6,6 +6,7 @@ import React, {
   memo,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import {
   Minus,
   Maximize2,
@@ -179,7 +180,7 @@ export const ContainerShell = memo(function ContainerShell({
   // ── Maximized ─────────────────────────────────────────────
 
   if (container.maximized) {
-    return (
+    const maximizedContent = (
       <div
         className="container-shell maximized focused animate-fade-in"
         style={{
@@ -187,10 +188,8 @@ export const ContainerShell = memo(function ContainerShell({
           inset: 0,
           width: "100vw",
           height: "100vh",
-          zIndex: container.zIndex,
+          zIndex: 999999, // Ensure it covers everything
           borderRadius: 0,
-          transform: `scale(${1 / zoom})`,
-          transformOrigin: "top left",
           ...(container.type !== "drawing" ? {
             "--surface": "#1A1A1A",
             "--text-primary": "#ffffff",
@@ -225,6 +224,11 @@ export const ContainerShell = memo(function ContainerShell({
         </div>
       </div>
     );
+
+    if (typeof document !== "undefined") {
+      return createPortal(maximizedContent, document.body);
+    }
+    return maximizedContent;
   }
 
   return (
