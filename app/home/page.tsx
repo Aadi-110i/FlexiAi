@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { MessageSquare, FolderOpen, FileText, Sparkles, Users, Search, ArrowRight, Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { ImageStreamHero } from "@/app/_components/ui/image-stream-hero";
 
 export default function HomePage() {
   return (
@@ -316,27 +317,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── BLOG SECTION ── */}
-      <section id="blog" style={{ padding: "120px 5%", background: "#fff", display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <h2 style={{ fontSize: "42px", fontWeight: 500, letterSpacing: "-0.02em", marginBottom: "80px" }}>Latest from Orbit</h2>
-        
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "32px", width: "100%", maxWidth: "1100px" }}>
-          <BlogCard 
-            date="Sep 14, 2026"
-            title="The Future of Contextual Workspaces"
-            desc="Why the standard desktop metaphor is failing modern knowledge workers, and what comes next."
-          />
-          <BlogCard 
-            date="Sep 02, 2026"
-            title="Announcing Multi-Model Chat"
-            desc="Compare responses from OpenAI, Anthropic, and Google side-by-side in real time."
-          />
-          <BlogCard 
-            date="Aug 28, 2026"
-            title="How to organize your chaos"
-            desc="Best practices for using infinite canvases to map out complex architectural decisions."
-          />
-        </div>
+      {/* ── LATEST FROM ORBIT SECTION ── */}
+      <section id="blog" style={{ background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", width: "100%", minHeight: "100vh", position: "relative" }}>
+        <ImageStreamHero
+          images={[
+            { src: "/images/blog1.jpg", alt: "Future of workspaces" },
+            { src: "/images/blog2.jpg", alt: "Multi-model chat" },
+            { src: "/images/blog3.jpg", alt: "Organize chaos" },
+            { src: "/images/blog1.jpg", alt: "Future of workspaces" },
+            { src: "/images/blog2.jpg", alt: "Multi-model chat" },
+            { src: "/images/blog3.jpg", alt: "Organize chaos" },
+          ]}
+          cards={6}
+          speed={24}
+          style={{ width: "100%", height: "100vh", position: "absolute", inset: 0 }}
+        >
+          <div style={{ pointerEvents: "none", position: "absolute", top: 0, left: 0, right: 0, bottom: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 20px", zIndex: 10 }}>
+            <div>
+              <h2 style={{ fontSize: "42px", fontWeight: 500, letterSpacing: "-0.02em", color: "#111", textShadow: "0 4px 24px rgba(255,255,255,0.8)" }}>Latest from Orbit</h2>
+            </div>
+          </div>
+        </ImageStreamHero>
       </section>
 
       {/* ── FAQ SECTION ── */}
@@ -515,11 +516,15 @@ function PricingCard({ title, price, desc, features, highlighted = false }: { ti
   );
 }
 
-function BlogCard({ date, title, desc }: { date: string, title: string, desc: string }) {
+function BlogCard({ date, title, desc, image }: { date: string, title: string, desc: string, image?: string }) {
   return (
     <div style={{ cursor: "pointer", group: "true" }} className="group">
-      <div style={{ width: "100%", height: "200px", background: "#f5f5f5", borderRadius: "16px", marginBottom: "24px", overflow: "hidden" }}>
-        <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #fbd5a9, #e1aa8b)", opacity: 0.8, transition: "opacity 0.3s" }} className="group-hover:opacity-100" />
+      <div style={{ width: "100%", height: "200px", background: "#f5f5f5", borderRadius: "16px", marginBottom: "24px", overflow: "hidden", position: "relative" }}>
+        {image ? (
+          <img src={image} alt={title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s" }} className="group-hover:scale-105" />
+        ) : (
+          <div style={{ width: "100%", height: "100%", background: "linear-gradient(135deg, #fbd5a9, #e1aa8b)", opacity: 0.8, transition: "opacity 0.3s" }} className="group-hover:opacity-100" />
+        )}
       </div>
       <div style={{ fontSize: "13px", color: "#888", fontWeight: 500, marginBottom: "8px" }}>{date}</div>
       <h3 style={{ fontSize: "22px", fontWeight: 600, marginBottom: "12px", lineHeight: 1.3 }}>{title}</h3>

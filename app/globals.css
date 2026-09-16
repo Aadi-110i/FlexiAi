@@ -883,3 +883,259 @@ body {
 @media (max-width: 480px) {
   .oracle-grid-5 { grid-template-columns: 1fr; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AUTH LAYOUT — Oracle Design System
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Split Layout Container ── */
+.auth-split-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background: var(--bg);
+}
+
+/* ── Top Bar (spanning full width) ── */
+.auth-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  z-index: 10;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px);
+}
+
+.auth-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-topbar-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-topbar-logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+.auth-topbar-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--fg);
+}
+
+.auth-topbar-tagline {
+  font-size: 13px;
+  color: var(--fg-subtle);
+  margin-left: 8px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+
+.auth-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+.auth-topbar-line {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Left Hero Panel ── */
+.auth-hero {
+  flex: 1;
+  background: var(--bg-elevated);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 100px 40px 40px;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+
+.auth-hero-content {
+  text-align: center;
+  max-width: 480px;
+  z-index: 2;
+}
+
+.auth-hero-title {
+  font-size: clamp(48px, 6vw, 72px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.auth-hero-subtitle {
+  font-size: 18px;
+  color: var(--fg-muted);
+  margin-bottom: 32px;
+}
+
+.auth-hero-tags {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.auth-hero-tag {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-muted);
+}
+
+.auth-hero-tag-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+
+/* Floating feature cards in hero */
+.auth-float-cards {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.auth-fc {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auth-fc-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.auth-fc-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-fc-sub {
+  font-size: 11px;
+  color: var(--fg-subtle);
+}
+
+/* Arbitrary positions for floating cards to simulate spatial canvas */
+.auth-fc-chat { top: 20%; left: 10%; transform: rotate(-2deg); }
+.auth-fc-research { top: 15%; right: 12%; transform: rotate(3deg); }
+.auth-fc-code { bottom: 30%; left: 15%; transform: rotate(1deg); }
+.auth-fc-notes { bottom: 25%; right: 10%; transform: rotate(-4deg); }
+.auth-fc-draw { top: 50%; right: 5%; transform: rotate(5deg); }
+
+/* Bottom labels in hero */
+.auth-hero-bottom {
+  position: absolute;
+  bottom: 32px;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--fg-subtle);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.auth-hero-bottom-center,
+.auth-hero-bottom-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-hero-bottom-line {
+  width: 32px;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Right Panel (Forms) ── */
+.auth-panel {
+  width: 480px;
+  flex-shrink: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 100px 48px 40px;
+  position: relative;
+  z-index: 5;
+}
+
+/* Hide hero on mobile */
+@media (max-width: 900px) {
+  .auth-hero { display: none; }
+  .auth-panel { width: 100%; border-left: none; }
+  .auth-topbar-tagline, .auth-topbar-right { display: none; }
+}
+
+/* Oracle Auth specific forms */
+.oracle-auth-card {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.oracle-input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--fg-subtle);
+  pointer-events: none;
+}
