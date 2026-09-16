@@ -345,6 +345,13 @@ function ContainerHeader({
       onPointerDown={onHeaderPointerDown}
       onPointerMove={onHeaderPointerMove}
       onPointerUp={onHeaderPointerUp}
+      style={{
+        background: "#ffffff",
+        color: "#1A1A1A",
+        "--text-primary": "#1A1A1A",
+        "--text-secondary": "#666666",
+        "--text-muted": "#999999",
+      } as React.CSSProperties}
     >
       {/* Drag grip */}
       <svg width="8" height="14" viewBox="0 0 8 14" fill="none" className="shrink-0 opacity-30">
@@ -389,28 +396,28 @@ function ContainerHeader({
           title="Duplicate"
           onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
         >
-          <Copy size={11} />
+          <Copy size={14} />
         </button>
         <button
           className="control-btn"
           title={isMaximized ? "Restore" : "Minimize"}
           onClick={(e) => { e.stopPropagation(); onMinimize(); }}
         >
-          <Minus size={11} />
+          <Minus size={14} />
         </button>
         <button
           className="control-btn"
           title={isMaximized ? "Restore" : "Maximize"}
           onClick={(e) => { e.stopPropagation(); onMaximize(); }}
         >
-          {isMaximized ? <Minimize2 size={11} /> : <Maximize2 size={11} />}
+          {isMaximized ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
         </button>
         <button
           className="control-btn danger"
           title="Close"
           onClick={(e) => { e.stopPropagation(); onClose(); }}
         >
-          <X size={11} />
+          <X size={14} />
         </button>
       </div>
     </div>
