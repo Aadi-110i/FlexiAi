@@ -1,4 +1,4 @@
-# FlexiAi (Orbit)
+# (Orbit)
 
 **Think without losing context.**
 
