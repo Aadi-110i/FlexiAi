@@ -141,16 +141,51 @@ function defaultTitle(type: ContainerType): string {
 
 function defaultSize(type: ContainerType): ContainerSize {
   const map: Record<ContainerType, ContainerSize> = {
-    chat: { width: 420, height: 560 },
-    note: { width: 360, height: 400 },
-    search: { width: 380, height: 480 },
-    code: { width: 520, height: 480 },
-    drawing: { width: 560, height: 460 },
+    chat: { width: 600, height: 800 },
+    note: { width: 480, height: 600 },
+    search: { width: 540, height: 720 },
+    code: { width: 720, height: 640 },
+    drawing: { width: 800, height: 640 },
   };
   return map[type];
 }
 
 const WORKSPACE_ID = "default";
+
+function getInitialContainers(): OrbContainer[] {
+  const ws = WORKSPACE_ID;
+  
+  const c1 = createContainer("search", { x: -750, y: -150 }, ws);
+  c1.size = { width: 500, height: 420 };
+  
+  const c2 = createContainer("chat", { x: -200, y: -350 }, ws);
+  c2.size = { width: 620, height: 750 };
+  // Pre-populate some code into the chat container to match screenshot vibe
+  if (c2.type === "chat") {
+    c2.state.messages = [
+      {
+        id: "1",
+        role: "assistant",
+        content: "Here is the code snippet you requested:\n```typescript\nimport React from 'react';\n\nexport function Component() {\n  return <div>Hello World</div>;\n}\n```",
+        timestamp: Date.now(),
+      }
+    ];
+  }
+  
+  const c3 = createContainer("search", { x: 470, y: -450 }, ws);
+  c3.size = { width: 460, height: 420 };
+  
+  const c4 = createContainer("note", { x: 470, y: 50 }, ws);
+  c4.size = { width: 440, height: 500 };
+  if (c4.type === "note") {
+    c4.state.content = "Project Ideas:\n\n- Dark mode support\n- Mobile responsive\n- Offline sync";
+  }
+  
+  const c5 = createContainer("search", { x: 970, y: -200 }, ws);
+  c5.size = { width: 480, height: 560 };
+  
+  return [c1, c2, c3, c4, c5];
+}
 
 export const useCanvasStore = create<CanvasState>()(
   persist(
@@ -160,7 +195,7 @@ export const useCanvasStore = create<CanvasState>()(
       panY: 0,
       zoom: 1,
       tool: "select",
-      containers: [],
+      containers: getInitialContainers(),
       selectedIds: [],
       activeId: null,
       isCommandPaletteOpen: false,

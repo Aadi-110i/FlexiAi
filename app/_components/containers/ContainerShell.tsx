@@ -191,6 +191,17 @@ export const ContainerShell = memo(function ContainerShell({
           borderRadius: 0,
           transform: `scale(${1 / zoom})`,
           transformOrigin: "top left",
+          ...(container.type !== "drawing" ? {
+            "--surface": "#1A1A1A",
+            "--text-primary": "#ffffff",
+            "--text-secondary": "rgba(255, 255, 255, 0.8)",
+            "--text-muted": "rgba(255, 255, 255, 0.5)",
+            "--surface-border": "rgba(255, 255, 255, 0.15)",
+            "--surface-raised": "rgba(255, 255, 255, 0.05)",
+            "--accent": "#D9A487",
+            "--accent-subtle": "rgba(217, 164, 135, 0.15)",
+            "--accent-text": "#D9A487",
+          } : {}) as React.CSSProperties
         }}
         onPointerDown={handleShellPointerDown}
         onContextMenu={handleContextMenu}
@@ -226,6 +237,17 @@ export const ContainerShell = memo(function ContainerShell({
         width: container.size.width,
         height: container.size.height,
         zIndex: container.zIndex,
+        ...(container.type !== "drawing" ? {
+          "--surface": "#1A1A1A",
+          "--text-primary": "#ffffff",
+          "--text-secondary": "rgba(255, 255, 255, 0.8)",
+          "--text-muted": "rgba(255, 255, 255, 0.5)",
+          "--surface-border": "rgba(255, 255, 255, 0.15)",
+          "--surface-raised": "rgba(255, 255, 255, 0.05)",
+          "--accent": "#D9A487",
+          "--accent-subtle": "rgba(217, 164, 135, 0.15)",
+          "--accent-text": "#D9A487",
+        } : {}) as React.CSSProperties
       }}
       onPointerDown={handleShellPointerDown}
       onContextMenu={handleContextMenu}
