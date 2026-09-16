@@ -180,9 +180,11 @@ export const useCanvasStore = create<CanvasState>()(
       // Containers
       addContainer: (type, position) => {
         const state = get();
+        const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+        const screenHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
         const center = position ?? {
-          x: -state.panX / state.zoom + 100 + Math.random() * 60,
-          y: -state.panY / state.zoom + 100 + Math.random() * 60,
+          x: -state.panX / state.zoom + (screenWidth / 2) / state.zoom - 200 + Math.random() * 40 - 20,
+          y: -state.panY / state.zoom + (screenHeight / 2) / state.zoom - 150 + Math.random() * 40 - 20,
         };
         const container = createContainer(type, center, WORKSPACE_ID);
         set((s) => ({ containers: [...s.containers, container], activeId: container.id }));

@@ -17,9 +17,12 @@ import { ContextMenu } from "@/app/_components/common/ContextMenu";
 import { WelcomeState } from "@/app/_components/common/WelcomeState";
 import { MinimizedTray } from "@/app/_components/common/MinimizedTray";
 import { useDemoWorkspace } from "@/app/_lib/hooks/useDemoWorkspace";
+import { RadarMinimap } from "./RadarMinimap";
 
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 3;
+// Use a log-scale factor so zoom-in and zoom-out are perfectly symmetric.
+// Factor per deltaY unit — 0.001 is conservative and won't get stuck.
 const ZOOM_SENSITIVITY = 0.001;
 
 export function WorkspaceCanvas() {
@@ -52,15 +55,18 @@ export function WorkspaceCanvas() {
       const state = useCanvasStore.getState();
 
       if (e.ctrlKey || e.metaKey) {
-        // Zoom
+        // ── Zoom ──────────────────────────────────────────────────────────────
+        // Use exponential scaling so zoom-in and zoom-out are always symmetric.
+        // Math.exp(k * -deltaY) means: positive deltaY → zoom out, negative → zoom in.
+        // This can never get stuck because the factor is always > 0.
         const canvas = canvasRef.current;
         if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
 
-        const delta = -e.deltaY * ZOOM_SENSITIVITY * state.zoom;
-        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, state.zoom + delta * state.zoom));
+        const factor = Math.exp(-e.deltaY * ZOOM_SENSITIVITY);
+        const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, state.zoom * factor));
         const ratio = newZoom / state.zoom;
 
         const newPanX = mouseX - ratio * (mouseX - state.panX);
@@ -69,7 +75,7 @@ export function WorkspaceCanvas() {
         state.setZoom(newZoom);
         state.setPan(newPanX, newPanY);
       } else {
-        // Pan
+        // ── Pan ───────────────────────────────────────────────────────────────
         state.setPan(state.panX - e.deltaX, state.panY - e.deltaY);
       }
     },
@@ -209,11 +215,12 @@ export function WorkspaceCanvas() {
       : "canvas-select";
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden" style={{ background: "var(--canvas-bg)" }}>
+    <div className="relative w-full h-full overflow-hidden" style={{ background: "var(--canvas-bg)" }}>
       {/* Canvas surface */}
       <div
         ref={canvasRef}
         className={`absolute inset-0 ${cursorClass}`}
+        style={{ touchAction: "none" }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -253,8 +260,8 @@ export function WorkspaceCanvas() {
         />
       )}
 
-      {/* Zoom indicator */}
-      <ZoomIndicator />
+      {/* Radar Minimap */}
+      <RadarMinimap />
     </div>
   );
 }

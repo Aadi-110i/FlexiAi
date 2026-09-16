@@ -13,6 +13,7 @@ import {
   Command,
 } from "lucide-react";
 import { useCanvasStore } from "@/app/_lib/store/canvas-store";
+import { useShallow } from "zustand/react/shallow";
 import type { ContainerType } from "@/app/_lib/types/container";
 
 const CREATE_ACTIONS: {
@@ -29,7 +30,13 @@ const CREATE_ACTIONS: {
 
 export const FloatingToolbar = memo(function FloatingToolbar() {
   const { tool, setTool, addContainer, openCommandPalette, fitCanvas } =
-    useCanvasStore();
+    useCanvasStore(useShallow((s) => ({
+      tool: s.tool,
+      setTool: s.setTool,
+      addContainer: s.addContainer,
+      openCommandPalette: s.openCommandPalette,
+      fitCanvas: s.fitCanvas,
+    })));
 
   const handleCreate = useCallback(
     (type: ContainerType) => {
@@ -40,17 +47,22 @@ export const FloatingToolbar = memo(function FloatingToolbar() {
 
   return (
     <div
-      className="fixed top-3 left-1/2 -translate-x-1/2 z-50"
-      style={{ zIndex: 9999 }}
+      className="fixed top-3 z-50"
+      style={{ left: "50%", transform: "translateX(-50%)", zIndex: 9999 }}
     >
       <div
-        className="flex items-center gap-1 px-3 py-1.5 rounded-2xl"
+        className="flex items-center gap-2 px-4 py-3 rounded-full"
         style={{
-          background: "var(--surface)",
-          border: "1px solid var(--surface-border)",
-          boxShadow: "var(--shadow-lg)",
-          backdropFilter: "blur(12px)",
-        }}
+          background: "rgba(255, 255, 255, 0.75)",
+          border: "1px solid rgba(0, 0, 0, 0.08)",
+          boxShadow: "0 12px 40px rgba(0, 0, 0, 0.08)",
+          backdropFilter: "blur(16px)",
+          fontFamily: "var(--font-geist-sans), 'Inter', sans-serif",
+          "--text-primary": "#1A1A1A",
+          "--text-secondary": "#595959",
+          "--surface-hover": "rgba(255, 255, 255, 0.95)",
+          "--surface-border": "rgba(0, 0, 0, 0.1)",
+        } as React.CSSProperties}
       >
         {/* Brand */}
         <div
@@ -58,13 +70,13 @@ export const FloatingToolbar = memo(function FloatingToolbar() {
           style={{ borderRight: "1px solid var(--surface-border)" }}
         >
           <div
-            className="w-5 h-5 rounded-md flex items-center justify-center text-[11px] font-bold"
+            className="w-6 h-6 rounded-md flex items-center justify-center text-[13px] font-bold"
             style={{ background: "var(--accent)", color: "white" }}
           >
             ✦
           </div>
           <span
-            className="text-[12px] font-bold tracking-tight"
+            className="text-[14px] font-bold tracking-tight"
             style={{ color: "var(--text-primary)" }}
           >
             Orbit
@@ -78,8 +90,8 @@ export const FloatingToolbar = memo(function FloatingToolbar() {
           onClick={() => setTool("select")}
           title="Select (V)"
         >
-          <MousePointer2 size={13} />
-          <span className="text-[12px]">Select</span>
+          <MousePointer2 size={16} />
+          <span className="text-[14px]">Select</span>
         </button>
         <button
           id="tool-hand"
@@ -87,8 +99,8 @@ export const FloatingToolbar = memo(function FloatingToolbar() {
           onClick={() => setTool("hand")}
           title="Pan (H)"
         >
-          <Hand size={13} />
-          <span className="text-[12px]">Hand</span>
+          <Hand size={16} />
+          <span className="text-[14px]">Hand</span>
         </button>
 
         <div className="toolbar-divider mx-0.5" />
@@ -102,8 +114,8 @@ export const FloatingToolbar = memo(function FloatingToolbar() {
             onClick={() => handleCreate(type)}
             title={`New ${label}`}
           >
-            <Icon size={13} />
-            <span className="text-[12px]">+{label}</span>
+            <Icon size={16} />
+            <span className="text-[14px]">+{label}</span>
           </button>
         ))}
 
@@ -115,7 +127,7 @@ export const FloatingToolbar = memo(function FloatingToolbar() {
           onClick={fitCanvas}
           title="Fit canvas (F)"
         >
-          <Maximize size={13} />
+          <Maximize size={16} />
         </button>
 
         {/* Command palette */}
@@ -125,7 +137,7 @@ export const FloatingToolbar = memo(function FloatingToolbar() {
           onClick={openCommandPalette}
           title="Command palette (⌘K)"
         >
-          <Command size={13} />
+          <Command size={16} />
         </button>
       </div>
     </div>
